@@ -22,4 +22,4 @@ ps:
 
 2.暂时只支持MySQL的生成，未来有时间可以学习下其他的
 
-####resouces内存放生成模板，默认是生成有get/set/constructors的文件，如需自定义请修改这里，不会请看freemarker文档
+#### resouces内存放生成模板，默认是生成有get/set/constructors的文件，如需自定义请修改这里，不会请看freemarker文档
