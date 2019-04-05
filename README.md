@@ -1,5 +1,5 @@
 # DBScan
-利用freemarker和Java反射等只是实现：实体生成器。
+利用freemarker和Java反射等知识实现：实体生成器。
 
 首先，描述下项目的实现过程：
 1.获取数据库连接的要素：url、password....
