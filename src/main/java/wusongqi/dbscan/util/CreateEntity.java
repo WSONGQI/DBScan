@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class CreateEntity {
 
-    private static File javaFile = null;
+    private static File[] javaFile = null;
 
     public boolean create(String tableName, List<DBColumn> dbColumns){
         Configuration cfg = new Configuration();
@@ -32,8 +32,11 @@ public class CreateEntity {
 
             cfg.setObjectWrapper(new DefaultObjectWrapper());
 
-            // 步骤二：获取 模板文件
-            Template template = cfg.getTemplate("entitytemplate.ftl");
+            // 步骤二：获取 模板文件 顺序要和javaFile一致
+            Template template[] = {cfg.getTemplate("entityTemplate.ftl"),
+                    cfg.getTemplate("daoTemplate.ftl"),
+                    cfg.getTemplate("serviceITemplate.ftl"),
+                    cfg.getTemplate("serviceImplTemplate.ftl")};
 
             // 步骤三：创建 数据模型
             Map<String, Object> root = createDataModel(tableName,dbColumns);
@@ -41,13 +44,16 @@ public class CreateEntity {
             // 步骤四：合并 模板 和 数据模型
             // 创建.java类文件
             if(javaFile != null){
-                Writer javaWriter = new FileWriter(javaFile);
-                template.process(root, javaWriter);
-                javaWriter.flush();
-                System.out.println("|文件生成路径：" + javaFile.getCanonicalPath());
-                System.out.println("————————————————————————————————————");
+                for(int i = 0;i < javaFile.length;i++){
+                    Writer javaWriter = new FileWriter(javaFile[i]);
+                    template[i].process(root, javaWriter);
 
-                javaWriter.close();
+                    javaWriter.flush();
+                    System.out.println("|文件生成路径：" + javaFile[i].getCanonicalPath());
+                    System.out.println("————————————————————————————————————");
+
+                    javaWriter.close();
+                }
             }
             // 输出到Console控制台
 //            Writer out = new OutputStreamWriter(System.out);
@@ -84,7 +90,12 @@ public class CreateEntity {
             outDirFile.mkdirs();
         }
 
-        javaFile = toJavaFilename(outDirFile, entity.getJavaPackage(), entity.getClassName());
+        // 这里是写入地址，由于我们要创建多个文件dao、entity、service所以用数组
+        javaFile = new File[4];
+        javaFile[0] = toJavaFilename(outDirFile, entity.getJavaPackage(), entity.getClassName());
+        javaFile[1] = toJavaFilename(outDirFile, entity.getJavaPackage(), entity.getClassName()+"Dao");
+        javaFile[2] = toJavaFilename(outDirFile, entity.getJavaPackage(), entity.getClassName()+"ServiceI");
+        javaFile[3] = toJavaFilename(outDirFile, entity.getJavaPackage(), entity.getClassName()+"ServiceImpl");
 
         //这个map就是传入ftl页面的
         root.put("entity", entity);
